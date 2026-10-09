@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Antigravity Quantum Physics & Particle Simulation Sandbox with real-time 60FPS dynamics, gravity wells, anti-gravity fields, and spatial audio synthesis.">
+  <title>Antigravity Nexus | Quantum Particle & Gravity Physics Sandbox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Space Canvas Background -->
+  <canvas id="physics-canvas"></canvas>
+
+  <!-- Interaction Ripple Overlay -->
+  <div id="ripple-container" aria-hidden="true"></div>
+
+  <!-- Top Navigation / Brand Header -->
+  <header class="app-header" id="app-header">
+    <div class="brand-group">
+      <div class="brand-symbol" aria-hidden="true">
+        <span class="symbol-core"></span>
+        <span class="symbol-ring"></span>
+      </div>
+      <div class="brand-text">
+        <h1 class="brand-title">ANTIGRAVITY <span class="badge-quantum">NEXUS</span></h1>
+        <p class="brand-subtitle">Quantum Particle Dynamics & Gravitational Field Lab</p>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Bar -->
+    <div class="telemetry-bar" id="telemetry-bar">
+      <div class="telemetry-item">
+        <span class="metric-label">FPS</span>
+        <span class="metric-val" id="fps-counter">60</span>
+      </div>
+      <div class="telemetry-divider"></div>
+      <div class="telemetry-item">
+        <span class="metric-label">PARTICLES</span>
+        <span class="metric-val" id="particle-count-display">1,800</span>
+      </div>
+      <div class="telemetry-divider"></div>
+      <div class="telemetry-item">
+        <span class="metric-label">ENERGY</span>
+        <span class="metric-val" id="kinetic-energy-display">94.2 kE</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btn-audio-toggle" class="btn-glass" title="Toggle Spatial Audio Synthesizer" aria-label="사운드 켜기/끄기">
+        <svg id="audio-icon-off" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+        <svg id="audio-icon-on" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <span id="audio-label">Sound Off</span>
+      </button>
+
+      <button id="btn-info-modal" class="btn-glass icon-only" title="가이드 및 조작법 열기" aria-label="정보 모달">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Left Floating Simulation Control HUD -->
+  <aside class="hud-panel hud-left" id="hud-controls" aria-label="시뮬레이션 조작 제어 패널">
+    <div class="panel-header">
+      <div class="panel-icon">⚛</div>
+      <span class="panel-title">PHYSICS MATRIX</span>
+      <button id="btn-collapse-hud" class="btn-mini-toggle" aria-label="패널 접기/펼치기">−</button>
+    </div>
+
+    <div class="panel-body">
+      <!-- Mode Presets -->
+      <div class="control-section">
+        <label class="section-label">SIMULATION PRESETS</label>
+        <div class="presets-grid" id="presets-container">
+          <button class="preset-btn active" data-preset="orbital" id="preset-orbital">
+            <span class="preset-icon">🪐</span>
+            <span class="preset-name">Orbital Sync</span>
+          </button>
+          <button class="preset-btn" data-preset="singularity" id="preset-singularity">
+            <span class="preset-icon">🌀</span>
+            <span class="preset-name">Singularity</span>
+          </button>
+          <button class="preset-btn" data-preset="antigravity" id="preset-antigravity">
+            <span class="preset-icon">⚡</span>
+            <span class="preset-name">Anti-Gravity</span>
+          </button>
+          <button class="preset-btn" data-preset="constellation" id="preset-constellation">
+            <span class="preset-icon">🧬</span>
+            <span class="preset-name">Neural Mesh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sliders for Physics Parameters -->
+      <div class="control-section">
+        <div class="slider-header">
+          <label for="slider-particle-count">Particle Density</label>
+          <span class="slider-val" id="val-particle-count">1,800</span>
+        </div>
+        <input type="range" id="slider-particle-count" min="400" max="4000" step="100" value="1800">
+      </div>
+
+      <div class="control-section">
+        <div class="slider-header">
+          <label for="slider-gravity">Gravity Well Power</label>
+          <span class="slider-val" id="val-gravity">1.2x</span>
+        </div>
+        <input type="range" id="slider-gravity" min="-3.0" max="4.0" step="0.1" value="1.2">
+      </div>
+
+      <div class="control-section">
+        <div class="slider-header">
+          <label for="slider-antigravity">Anti-Gravity Repulsion</label>
+          <span class="slider-val" id="val-antigravity">2.0x</span>
+        </div>
+        <input type="range" id="slider-antigravity" min="0.0" max="5.0" step="0.2" value="2.0">
+      </div>
+
+      <div class="control-section">
+        <div class="slider-header">
+          <label for="slider-friction">Fluid Damping (Drag)</label>
+          <span class="slider-val" id="val-friction">0.985</span>
+        </div>
+        <input type="range" id="slider-friction" min="0.920" max="0.999" step="0.005" value="0.985">
+      </div>
+
+      <!-- Color Spectra Palettes -->
+      <div class="control-section">
+        <label class="section-label">SPECTRAL PALETTE</label>
+        <div class="theme-chips" id="theme-chips">
+          <button class="chip-theme active" data-theme="nebula" id="theme-nebula" title="Nebula Cyan/Violet">
+            <span class="color-dot" style="background: linear-gradient(135deg, #00f2fe, #4facfe);"></span>
+            <span>Nebula</span>
+          </button>
+          <button class="chip-theme" data-theme="supernova" id="theme-supernova" title="Supernova Amber/Crimson">
+            <span class="color-dot" style="background: linear-gradient(135deg, #ff0844, #ffb199);"></span>
+            <span>Supernova</span>
+          </button>
+          <button class="chip-theme" data-theme="cyberpunk" id="theme-cyberpunk" title="Cyberpunk Neon Magenta">
+            <span class="color-dot" style="background: linear-gradient(135deg, #f857a6, #ff5858);"></span>
+            <span>Cyberpunk</span>
+          </button>
+          <button class="chip-theme" data-theme="matrix" id="theme-matrix" title="Quantum Matrix Emerald">
+            <span class="color-dot" style="background: linear-gradient(135deg, #0ba360, #3cba92);"></span>
+            <span>Emerald</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="action-grid">
+        <button id="btn-burst" class="btn-action primary" title="Generate explosive shockwave ripple">
+          <span class="btn-glow"></span>
+          <span>💥 Kinetic Shockwave</span>
+        </button>
+        <button id="btn-reverse-gravity" class="btn-action" title="Invert current gravity direction">
+          <span>🔄 Invert Gravity</span>
+        </button>
+        <button id="btn-reset-particles" class="btn-action danger" title="Clear and respawn all particles">
+          <span>⚡ Reset Universe</span>
+        </button>
+        <button id="btn-capture-snapshot" class="btn-action success" title="Download High-Res 4K Snapshot">
+          <span>📸 Capture Frame</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Bottom Interactive Floating Interaction Helper -->
+  <footer class="hud-bottom-tip" id="hud-bottom-tip">
+    <div class="tip-content">
+      <span class="key-badge">좌클릭 / 드래그</span>
+      <span class="tip-text">중력장(Attractor) 생성</span>
+      <span class="tip-sep">•</span>
+      <span class="key-badge">우클릭 / Shift+클릭</span>
+      <span class="tip-text">반중력 척력장(Anti-Gravity Repulsor) 발산</span>
+      <span class="tip-sep">•</span>
+      <span class="key-badge">Spacebar</span>
+      <span class="tip-text">충격파 펄스 방출</span>
+    </div>
+  </footer>
+
+  <!-- Info Modal Dialog -->
+  <dialog id="modal-info" class="glass-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="dialog-badge">GOOGLE DEEPMIND ANTIGRAVITY</span>
+          <h2>Antigravity Physics & Dynamics Engine</h2>
+        </div>
+        <button id="btn-close-modal" class="btn-dialog-close" aria-label="닫기">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <p class="dialog-lead">
+          이 웹 애플리케이션은 <strong>Antigravity 자율 에이전트</strong>에 의해 기획부터 바닐라 HTML5/CSS3/JS 설계, 
+          물리 엔진 최적화, 사운드 신디사이저, 브라우저 자율 테스트까지 원스톱으로 구축되었습니다.
+        </p>
+
+        <div class="features-list">
+          <div class="feature-card">
+            <div class="feat-icon">⚡</div>
+            <h4>Verlet / Euler 복합 물리 엔진</h4>
+            <p>초당 60프레임으로 4,000개 이상의 입자를 부드럽게 시뮬레이션하며, 뉴턴 중력장 및 반중력 척력장을 실시간 연산합니다.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feat-icon">🎨</div>
+            <h4>Modern Glassmorphic UI</h4>
+            <p>다크 모드 옵시디언 테마, 블러 20px의 글래스모피즘 HUD, 유려한 마이크로 인터랙션을 결합한 프리미엄 디자인입니다.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feat-icon">🎵</div>
+            <h4>Spatial Web Audio Synth</h4>
+            <p>입자 속도와 상호작용에 동기화되는 절차적 앰비언트 드론과 하모닉 차임 사운드를 생성합니다.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feat-icon">🤖</div>
+            <h4>자율 검증 & 브라우저 서브에이전트</h4>
+            <p>Antigravity Browser Subagent가 직접 웹페이지를 탐색하고 클릭/드래그 상호작용을 검증하며 비디오를 기록합니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button id="btn-modal-confirm" class="btn-action primary">확인 및 시작하기</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Core Physics & Interaction Script -->
+  <script src="app.js"></script>
+</body>
+</html>
